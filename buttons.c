@@ -1,6 +1,6 @@
 ﻿#include "buttons.h"
 
-extern int result;
+extern int result; /* 결과값에 해당하는 숫자 */
 
 /* 0번 버튼을 누르면 실행되는 함수 */ 
 void button0() { 
