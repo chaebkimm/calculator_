@@ -1,43 +1,63 @@
-#include "buttons.h"
+﻿#include "buttons.h"
 
 extern int result;
 
-void button0() { // 0�� ��ư�� ������ ����Ǵ� �Լ�
+/* 0번 버튼을 누르면 실행되는 함수 */ 
+void button0() { 
+	/*To Do: result에 0을 대입하기*/
 
 }
 
-void button1() { // 1�� ��ư�� ������ ����Ǵ� �Լ�
+/* 1번 버튼을 누르면 실행되는 함수 */ 
+void button1() { 
+	/*To Do: result에 1을 대입하기*/
 
 }
 
-void button2() { // 2�� ��ư�� ������ ����Ǵ� �Լ�
+/* 2번 버튼을 누르면 실행되는 함수 */ 
+void button2() { 
+	/*To Do: result에 2을 대입하기*/
 
 }
 
-void button3() { // 3�� ��ư�� ������ ����Ǵ� �Լ�
+/* 3번 버튼을 누르면 실행되는 함수 */ 
+void button3() { 
+	/*To Do: result에 3을 대입하기*/
 
 }
 
-void button4() { // 4�� ��ư�� ������ ����Ǵ� �Լ�
+/* 4번 버튼을 누르면 실행되는 함수 */ 
+void button4() { 
+	/*To Do: result에 4을 대입하기*/
 
 }
 
-void button5() { // 5�� ��ư�� ������ ����Ǵ� �Լ�
+/* 5번 버튼을 누르면 실행되는 함수 */ 
+void button5() { 
+	/*To Do: result에 5을 대입하기*/
 
 }
 
-void button6() { // 6�� ��ư�� ������ ����Ǵ� �Լ�
+/* 6번 버튼을 누르면 실행되는 함수 */ 
+void button6() { 
+	/*To Do: result에 6을 대입하기*/
 
 }
 
-void button7() { // 7�� ��ư�� ������ ����Ǵ� �Լ�
+/* 7번 버튼을 누르면 실행되는 함수 */ 
+void button7() { 
+	/*To Do: result에 7을 대입하기*/
 
 }
 
-void button8() { // 8�� ��ư�� ������ ����Ǵ� �Լ�
+/* 8번 버튼을 누르면 실행되는 함수 */ 
+void button8() { 
+	/*To Do: result에 8을 대입하기*/
 
 }
 
-void button9() { // 9�� ��ư�� ������ ����Ǵ� �Լ�
+/* 9번 버튼을 누르면 실행되는 함수 */ 
+void button9() { 
+	/*To Do: result에 9을 대입하기*/
 
 }
