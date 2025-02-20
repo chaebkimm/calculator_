@@ -61,3 +61,9 @@ void button9() {
 	/*To Do: result에 9을 대입하기*/
 
 }
+
+/* 삭제 버튼을 누르면 실행되는 함수 */
+void button_backspace() {
+	/*To Do: result에 0을 대입하기*/
+
+}

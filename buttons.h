@@ -16,6 +16,7 @@ extern void button6(); // 6번 버튼을 누르면 실행되는 함수
 extern void button7(); // 7번 버튼을 누르면 실행되는 함수
 extern void button8(); // 8번 버튼을 누르면 실행되는 함수
 extern void button9(); // 9번 버튼을 누르면 실행되는 함수
+extern void button_backspace(); // <- 버튼을 누르면 실행되는 함수
 
 #ifdef __cplusplus
 }

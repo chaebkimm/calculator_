@@ -7,7 +7,7 @@
 #include "calculator.h"
 
 #define MAX_LOADSTRING 100
-#define BUTTON_COUNT 10
+#define BUTTON_COUNT 11
 
 /* 결과창과 결과값 */
 static HWND hWndResult; // 결과 창
@@ -17,12 +17,15 @@ extern int result = 0;  // 결과 값 (다른 소스파일과 공유됨)
 static char buttonState[BUTTON_COUNT];          // 버튼 상태
 static COLORREF buttonTextColor[BUTTON_COUNT];  // 글자색
 static COLORREF buttonBgColor[BUTTON_COUNT];    // 배경색
+static COLORREF buttonShadowColor[BUTTON_COUNT];  // 그림자색
 
 /* 색깔 상수들 */
 static const COLORREF BUTTON_TEXT_COLOR = RGB(50, 50, 50);              // 일반 글자색
 static const COLORREF BUTTON_TEXT_COLOR_CLICKED = RGB(150, 150, 150);   // 클릭시 글자색
 static const COLORREF BUTTON_BG_COLOR = RGB(245, 245, 245);             // 일반 배경색
 static const COLORREF BUTTON_BG_COLOR_CLICKED = RGB(240, 240, 240);     // 클릭시 배경색
+static const COLORREF BUTTON_SHADOW_COLOR = RGB(200, 200, 200);             // 일반 배경색
+static const COLORREF BUTTON_SHADOW_COLOR_CLICKED = RGB(240, 240, 240);     // 클릭시 배경색
 
 /* 디버그 함수: 콘솔에 메시지를 출력*/
 void debug(UINT message);
@@ -31,122 +34,165 @@ void debug(UINT message);
 LRESULT CALLBACK ButtonProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 
     /* 버튼 클릭시 실행할 함수들의 배열 */
-    static void(*buttonClick[10])() = {
+    static void(*buttonClick[BUTTON_COUNT])() = {
         button0, button1, button2, button3, button4,
-        button5, button6, button7, button8, button9
+        button5, button6, button7, button8, button9, 
+        button_backspace
     };
     static bool clicked = false; // 클릭 중인 버튼이 있는지
     int buttonIndex = GetDlgCtrlID(hWnd) - 1; // 버튼 숫자
 
-    // 디버그 
-    // printf("ButtonProc %d: \n", buttonIndex);
-    // debug(message);
-
-    switch (message) {
-    case WM_LBUTTONUP: // 마우스 버튼을 땠을 때
-    {
+    if (buttonIndex < BUTTON_COUNT) { // 버튼 번호 확인
         // 디버그 
-        //printf("if: WM_LBUTTONUP, cliked = %d \n", clicked);
+        // printf("ButtonProc %d: \n", buttonIndex);
+        // debug(message);
 
-        clicked = false; // 클릭중 상태 해제
+        switch (message) {
 
-        /* 버튼 상태 및 색깔 변경*/
-        buttonState[buttonIndex] = 'u';
-        buttonTextColor[buttonIndex] = BUTTON_TEXT_COLOR;
-        buttonBgColor[buttonIndex] = BUTTON_BG_COLOR;
+        case WM_MOUSELEAVE: // 마우스 버튼이 바깥으로 나갈 때
+        case WM_LBUTTONUP: // 마우스 버튼을 땠을 때
+        {
+            // 디버그 
+            //printf("if: WM_LBUTTONUP, cliked = %d \n", clicked);
 
-        /* 버튼 다시 그리기 */
-        InvalidateRect(hWnd, NULL, TRUE);
-        UpdateWindow(hWnd);
-    }
-    break;
-    
-    case WM_LBUTTONDOWN: // 마우스 버튼을 누를 때
-    {
-        // 디버그 
-        // printf("if: WM_LBUTTONDOWN, clicked: %d \n", clicked);
-
-        if (!clicked) { // 클릭중이 아닐 때만 반응
-            clicked = true; // 클릭중 상태 설정
-
-            buttonClick[buttonIndex](); // 클릭 함수 실행
-
-            /* 결과창 다시 그리기 */
-            InvalidateRect(hWndResult, NULL, TRUE);
-            UpdateWindow(hWndResult);
+            clicked = false; // 클릭중 상태 해제
 
             /* 버튼 상태 및 색깔 변경*/
-            buttonState[buttonIndex] = 'd';
-            buttonTextColor[buttonIndex] = BUTTON_TEXT_COLOR_CLICKED;
-            buttonBgColor[buttonIndex] = BUTTON_BG_COLOR_CLICKED;
+            buttonState[buttonIndex] = 'u';
+            buttonTextColor[buttonIndex] = BUTTON_TEXT_COLOR;
+            buttonBgColor[buttonIndex] = BUTTON_BG_COLOR;
+            buttonShadowColor[buttonIndex] = BUTTON_SHADOW_COLOR;
 
             /* 버튼 다시 그리기 */
             InvalidateRect(hWnd, NULL, TRUE);
             UpdateWindow(hWnd);
-
-            /* 콘솔 출력 */
-            printf("----------버튼 클릭됨. 숫자 %d----------\n", buttonIndex);
         }
-    }
-    break;
+        break;
 
-    case WM_PAINT: // 그림 그리기
-    {
-        // 디버그 printf("if: WM_PAINT \n");
-        PAINTSTRUCT ps;
+        case WM_LBUTTONDOWN: // 마우스 버튼을 누를 때
+        {
+            // 디버그 
+            // printf("if: WM_LBUTTONDOWN, clicked: %d \n", clicked);
 
-        HDC hdc = BeginPaint(hWnd, &ps); // 그림 그리기 시작
+            if (!clicked) { // 클릭중이 아닐 때만 반응
+                clicked = true; // 클릭중 상태 설정
 
-        /* 배경 색칠하기 */
-        HBRUSH hBrush = CreateSolidBrush(buttonBgColor[buttonIndex]);
-        FillRect(hdc, &ps.rcPaint, hBrush);
-        DeleteObject(hBrush);
+                buttonClick[buttonIndex](); // 클릭 함수 실행
 
-        /* 글자 쓰기 */
-        wchar_t buttonText[2] = { '0' + buttonIndex };
+                /* 결과창 다시 그리기 */
+                InvalidateRect(hWndResult, NULL, TRUE);
+                UpdateWindow(hWndResult);
 
-        RECT rc; // 계산기 창 기준 버튼 모서리 좌표
-        GetWindowRect(hWnd, &rc);
+                /* 버튼 상태 및 색깔 변경*/
+                buttonState[buttonIndex] = 'd';
+                buttonTextColor[buttonIndex] = BUTTON_TEXT_COLOR_CLICKED;
+                buttonBgColor[buttonIndex] = BUTTON_BG_COLOR_CLICKED;
+                buttonShadowColor[buttonIndex] = BUTTON_SHADOW_COLOR_CLICKED;
 
-        // 디버그 printf("L: %d, R: %d, U: %d, D: %d", rc.left, rc.right, rc.top, rc.bottom);
+                /* 버튼 다시 그리기 */
+                InvalidateRect(hWnd, NULL, TRUE);
+                UpdateWindow(hWnd);
 
-        RECT rc2; // 버튼 기준 버튼 모서리 좌표
-        rc2.left = 0;
-        rc2.top = 0;
-        rc2.right = rc.right - rc.left;
-        rc2.bottom = rc.bottom - rc.top;
+                /* 콘솔 출력 */
+                if (buttonIndex >= 0 && buttonIndex <= 9) {
+                    printf("----------버튼 클릭됨. 숫자 %d----------\n", buttonIndex);
+                }
+                else if (buttonIndex == 10) {
+                    printf("----------버튼 클릭됨. 숫자 하나 지우기 ----------\n");
+                }
+                else {
+                    printf("----------버튼 클릭됨. ----------\n");
+                }
 
-        SetBkMode(hdc, TRANSPARENT); // 글자의 배경색 투명하게
-        SetTextColor(hdc, buttonTextColor[buttonIndex]); // 글자색
+            }
+        }
+        break;
 
-        HFONT hFont = CreateFont( // 폰트 Arial 24
-            24,
-            0,
-            0,
-            0,
-            FW_NORMAL,
-            FALSE,
-            FALSE,
-            FALSE,
-            DEFAULT_CHARSET,
-            OUT_DEFAULT_PRECIS,
-            CLIP_DEFAULT_PRECIS,
-            DEFAULT_QUALITY,
-            DEFAULT_PITCH | FF_SWISS,
-            L"Arial"
-        );
+        case WM_PAINT: // 그림 그리기
+        {
+            // 디버그 printf("if: WM_PAINT \n");
+            PAINTSTRUCT ps;
 
-        SelectObject(hdc, hFont); // 폰트 설정
+            HDC hdc = BeginPaint(hWnd, &ps); // 그림 그리기 시작
 
-        // 글자 그리기
-        DrawText(hdc, buttonText, -1, &rc2, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+            /* 배경 색칠하기 */
+            COLORREF bgColor = buttonBgColor[buttonIndex];
+            HBRUSH hBrush = CreateSolidBrush(bgColor);
+            FillRect(hdc, &ps.rcPaint, hBrush);
+            DeleteObject(hBrush);
 
-        EndPaint(hWnd, &ps); // 그리기 끝
-    }
-    break;
+            /* 글자 쓰기 */
+            wchar_t buttonText[2] = { 0 };
 
-    default:
-        return DefWindowProc(hWnd, message, wParam, lParam);
+            if (buttonIndex < 10) {
+                buttonText[0] = '0' + buttonIndex;
+            }
+            else if (buttonIndex == 10) {
+                buttonText[0] = L'⌫';
+            }
+
+            RECT rc; // 계산기 창 기준 버튼 모서리 좌표
+            GetWindowRect(hWnd, &rc);
+
+            // 디버그 printf("L: %d, R: %d, U: %d, D: %d", rc.left, rc.right, rc.top, rc.bottom);
+
+            RECT rc2; // 버튼 기준 버튼 모서리 좌표
+            rc2.left = 0;
+            rc2.top = 0;
+            rc2.right = rc.right - rc.left;
+            rc2.bottom = rc.bottom - rc.top;
+
+            SetBkMode(hdc, TRANSPARENT); // 글자의 배경색 투명하게
+
+            COLORREF textColor = buttonTextColor[buttonIndex];
+            SetTextColor(hdc, textColor); // 글자색
+
+            HFONT hFont = CreateFont( // 폰트 Arial 24
+                24,
+                0,
+                0,
+                0,
+                FW_NORMAL,
+                FALSE,
+                FALSE,
+                FALSE,
+                DEFAULT_CHARSET,
+                OUT_DEFAULT_PRECIS,
+                CLIP_DEFAULT_PRECIS,
+                DEFAULT_QUALITY,
+                DEFAULT_PITCH | FF_SWISS,
+                L"Arial"
+            );
+
+            SelectObject(hdc, hFont); // 폰트 설정
+
+            // 글자 그리기
+            DrawText(hdc, buttonText, -1, &rc2, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+
+            rc2.top = rc2.bottom - 1;
+
+            COLORREF shadowColor = buttonShadowColor[buttonIndex];
+            hBrush = CreateSolidBrush(shadowColor);
+            FillRect(hdc, &rc2, hBrush);
+            DeleteObject(hBrush);
+
+            EndPaint(hWnd, &ps); // 그리기 끝
+        }
+        break;
+
+        case WM_MOUSEMOVE:
+        {
+            TRACKMOUSEEVENT event = {
+                sizeof(event),
+                TME_LEAVE,
+                hWnd,
+                HOVER_DEFAULT
+            };
+            TrackMouseEvent(&event);
+        }
+        default:
+            return DefWindowProc(hWnd, message, wParam, lParam);
+        }
     }
 
     return 0;
@@ -214,7 +260,7 @@ ATOM RegisterWindowClass(HINSTANCE hInstance)
 
     wcex.cbSize = sizeof(WNDCLASSEX);
 
-    wcex.style          = CS_HREDRAW | CS_VREDRAW | CS_DROPSHADOW;
+    wcex.style          = CS_HREDRAW | CS_VREDRAW;
     wcex.lpfnWndProc    = WndProc;
     wcex.cbClsExtra     = 0;
     wcex.cbWndExtra     = 0;
@@ -276,7 +322,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     int screenHeight = rc.bottom;
 
     /* 창 크기와 모니터에서의 좌표 */
-    int windowWidth = 280;
+    int windowWidth = 360;
     int windowHeight = 360;
 
     int posX = (screenWidth - windowWidth) / 2;
@@ -348,13 +394,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             // 버튼 위치
             int posX, posY;
-            if (i) {
+            if (i == 0) { // 숫자 0
+                posX = 20 + 80;
+                posY = windowHeight - 30 - 40;
+            }
+            else if (i >= 1 && i <= 9) { // 숫자 1-9
                 posX = 20 + 80 * ((i - 1) % 3);
                 posY = windowHeight - 30 - 40 - 55 * ((i + 2) / 3);
             }
-            else {
-                posX = 20 + 80;
-                posY = windowHeight - 30 - 40;
+            else if (i == 10) { // 지우기 버튼
+                posX = 20 + 80 * 3;
+                posY = windowHeight - 30 - 40 - 55 * 3;
             }
 
             // 버튼 이름
@@ -380,6 +430,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             buttonTextColor[i] = BUTTON_TEXT_COLOR;
             buttonBgColor[i] = BUTTON_BG_COLOR;
 
+            buttonState[i] = 'u';
+            buttonShadowColor[i] = BUTTON_SHADOW_COLOR;
+
             // 디버그 printf("Button %d: hwnd %d, proc %p, col %x\n", i, hwndButtons[i], GetWindowLongPtr(hwndButtons[i], GWLP_WNDPROC), buttonTextColors[i]);
         }
 
@@ -387,7 +440,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         int posX, posY;
         posX = 20;
         posY = windowHeight - 30 - 40 - 55 * 4;
-        int w = 60 * 3 + 20 * 2;
+        int w = 60 * 4 + 20 * 3;
         int h = 40;
 
         // 결과 화면 만들기
